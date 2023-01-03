@@ -4,6 +4,7 @@ import sqlite3 # sqlite3 es un gestor de base de datos incluido en python
 root = Tk()
 root.title('Hola Mundo: todo list')
 root.geometry('350x500')
+root.configure(bg='#333233')
 
 # Crear y conectar base de datos
 conn = sqlite3.connect('todo.db')
@@ -25,7 +26,10 @@ conn.commit()
 # Creando funcion de complete (currying(retrasamos la ejecución de una función) aplicado)
 def complete(id):
     def _complete():
-        print(id)
+        todo = c.execute("SELECT * from todo WHERE id = ?", (id, )).fetchone() 
+        c.execute("UPDATE todo SET completed = ? WHERE id = ?", (not todo[3], id))
+        conn.commit()
+        render_todos()
     return _complete
 #-------------------------------
 
@@ -38,8 +42,10 @@ def render_todos():
         id = rows[i][0]
         completed = rows[i][3]
         description = rows[i][2]
-        l = Checkbutton(frame, text=description, width=42, anchor='w', command=complete(id))
+        color = '#018CB1' if completed else '#555555'
+        l = Checkbutton(frame, text=description, fg=color, width=42, anchor='w', command=complete(id))
         l.grid(row=i, column=0, sticky='w') # sticky 'w' pega la etiqueta a la izquierda
+        l.select() if completed else l.deselect()
 #----------------------------------
 
 # Creando funcion para agregar tareas y que no se puedan agregar tareas vacias
@@ -57,18 +63,18 @@ def addTodo():
 #--------------------------------
 
 # Creando la interfaz grafica
-l = Label(root, text='Tarea')
+l = Label(root, text='Tarea', fg='white', bg='#333233')
 l.grid(row=0, column=0)
 
 e = Entry(root, width=40)
 e.grid(row=0, column=1)
 
-btn = Button(root, text='Agregar', command=addTodo)
+btn = Button(root, text='Agregar', command=addTodo, fg='white', bg='#8A918C')
 btn.grid(row=0, column=2)
 #--------------------------------
 
 # Creando el frame
-frame = LabelFrame(root, text='Mis tareas', padx=5, pady=5)
+frame = LabelFrame(root, text='Mis tareas', padx=5, pady=5, bg='#333233', fg='white')
 frame.grid(row=1, column=0, columnspan=3, sticky='nswe', padx=5)
 
 e.focus()
