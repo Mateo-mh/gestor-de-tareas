@@ -24,7 +24,7 @@ conn.commit()
 
 # Creando la interfaz grafica
 l = Label(root, text='Tarea')
-l.pack(row=0, column=0)
+l.grid(row=0, column=0)
 
 e = Entry(root, width=40)
 e.grid(row=0, column=1)
