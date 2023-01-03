@@ -3,7 +3,7 @@ import sqlite3 # sqlite3 es un gestor de base de datos incluido en python
 
 root = Tk()
 root.title('Hola Mundo: todo list')
-root.geometry('350x500')
+root.geometry('400x500')
 root.configure(bg='#333233')
 
 # Crear y conectar base de datos
@@ -23,6 +23,15 @@ c.execute("""
 conn.commit()
 # -------------------------------
 
+# Creando funcion remove para poder eliminar los todos
+def remove(id):
+    def _remove():
+        c.execute("DELETE FROM todo WHERE id=?", (id, ))
+        conn.commit()
+        render_todos()
+    return _remove
+#-----------------------------
+
 # Creando funcion de complete (currying(retrasamos la ejecución de una función) aplicado)
 def complete(id):
     def _complete():
@@ -36,7 +45,8 @@ def complete(id):
 # Creando funcion para renderizar los elementos
 def render_todos():
     rows = c.execute("SELECT * FROM todo").fetchall()
-    print(rows)
+    for widget in frame.winfo_children():
+        widget.destroy()
 
     for i in range(0, len(rows)):
         id = rows[i][0]
@@ -45,6 +55,8 @@ def render_todos():
         color = '#018CB1' if completed else '#555555'
         l = Checkbutton(frame, text=description, fg=color, width=42, anchor='w', command=complete(id))
         l.grid(row=i, column=0, sticky='w') # sticky 'w' pega la etiqueta a la izquierda
+        btn = Button(frame, text='Eliminar', command=remove(id), bg='#018CB1', fg='white')
+        btn.grid(row=i, column=1)       
         l.select() if completed else l.deselect()
 #----------------------------------
 
