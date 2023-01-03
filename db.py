@@ -22,17 +22,26 @@ c.execute("""
 conn.commit()
 # -------------------------------
 
+# Creando funcion de complete (currying(retrasamos la ejecución de una función) aplicado)
+def complete(id):
+    def _complete():
+        print(id)
+    return _complete
+#-------------------------------
+
 # Creando funcion para renderizar los elementos
 def render_todos():
     rows = c.execute("SELECT * FROM todo").fetchall()
     print(rows)
 
     for i in range(0, len(rows)):
+        id = rows[i][0]
         completed = rows[i][3]
         description = rows[i][2]
-        l = Checkbutton(frame, text=description, width=42, anchor='w')
+        l = Checkbutton(frame, text=description, width=42, anchor='w', command=complete(id))
         l.grid(row=i, column=0, sticky='w') # sticky 'w' pega la etiqueta a la izquierda
 #----------------------------------
+
 # Creando funcion para agregar tareas y que no se puedan agregar tareas vacias
 def addTodo():
     todo = e.get()
